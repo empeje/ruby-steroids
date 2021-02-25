@@ -1,0 +1,26 @@
+FROM ruby:2.6.5-slim AS builder
+
+# install and enable jemalloc
+# also install nodejs and yarn
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  curl \
+  git \
+  gnupg2 \
+  libjemalloc2 \
+  libmariadb-dev \
+  nodejs \
+  npm && npm install --global yarn
+
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
+
+# verify jemalloc is used by ruby
+# no output == jemalloc is not enabled
+RUN MALLOC_CONF=stats_print:true ruby -e "exit"
+
+# always skip installing gem documentation
+RUN mkdir -p /usr/local/etc \
+    && { \
+      echo 'install: --no-document'; \
+      echo 'update: --no-document'; \
+    } >> /usr/local/etc/gemrc
