@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
-docker tag $IMAGE_NAME $DOCKER_REPO:$SOURCE_COMMIT
-docker push $DOCKER_REPO:$SOURCE_COMMIT
+if [[ "$IMAGE_NAME" == *"compile"* ]]; then
+  export NEW_IMAGE_NAME="$DOCKER_REPO:compile-$SOURCE_COMMIT"
+else
+  export NEW_IMAGE_NAME="$DOCKER_REPO:$SOURCE_COMMIT"
+fi
+
+docker tag $IMAGE_NAME $NEW_IMAGE_NAME
+docker push $NEW_IMAGE_NAME
 
